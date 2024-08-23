@@ -1,80 +1,36 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
-import { Dialog, DialogContent, DialogTitle, IconButton, TextField, Button } from "@mui/material";
-import { CloseIcon, SendIcon } from "@mui/icons-material";
-// import axios from "axios";
-import { Margin, Send } from "@mui/icons-material";
+import { Box, Button, Stack, TextField, Typography } from "@mui/material";
+import { Send } from "@mui/icons-material";
+import { useRouter } from "next/navigation";
+// import { useChat } from "ai/react";
 
 const Chatbot = () => {
 
-  const [userInput, setUserInput] = useState("");
-  const [responses, setResponses] = useState([]);
-  const [isTyping, setIsTyping] = useState(false);
-  const messageEndRef = useRef(null);
-
-  const scrollToBottom = () => {
-      messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
-
-      useEffect(() => {
-          scrollToBottom();
-      }, [responses])
-  }
-
-  const handleSendMessages = async () => {
-      // if (userInput.trim !== "") {
-      //     const newMessage = {
-      //         message: userInput,
-      //         from: 'user'
-      //     }
-
-      //     setResponses(oldResponses => [...oldResponses, newMessage]);
-      //     setUserInput("");
-      //     setIsTyping(true);
-
-      //     // Communicating with the OpenAI API
-      //     try {
-      //       const {data} = await axios.post('/api/chatbot', { messages: responses.concat(newMessage) });
-      //       setTimeout(() => {
-      //           setResponses(oldResponses => [...oldResponses, { message: data.response, from: 'bot' }])
-      //           setIsTyping(false)
-      //       }, 500);
-      //     } catch (error) {
-      //         console.error("Error occurrred during fetching data,", error);
-      //         setResponses(oldResponses => [...oldResponses, {message: "Failed to fetch response",  from: "bot"}])
-
-      //     }
-      // }
-  };
-
-  // 
+  const [messages, setMessages] = useState([]);
+  const [message, setMessage] = useState('');
 
   return (
-    <>
-      <Button variant="contained" color="primary" style={{ position: "fixed", bottom: 20, right: 20 }}>
-        Open Chat
-      </Button>
-      <Dialog open={true} fullWidth maxWidth='sm'>
-        <DialogTitle className="bg-gray-100 text-xl leading-6 font-medium text-gray-900">
-          How can I assist?
-        </DialogTitle>
-        <DialogContent className="p-4">
-          <div className="min-h-[200px]
-          max-g-[400px] overflow-y-auto">
-            {responses.map((res, index) => (
-              <div key = {index} className={`p-2 rounded-lg m-2 ${res.from === 'user' ? "bg-blue-400 ml-auto" : "bg-white mr-auto"}`}>
-                 <p className="text-black">
-                   {res.message}
-                 </p>
-              </div>
+    <Box width="100vw" height="100vh" display="flex" flexDirection="column" justifyContent="center" alignItems="center">
+        <Stack direction="column" width="500px" height="700px" border="1px solid black" p={2} spacing={3}>
+          <Stack direction="column" spacing={2} flexGrow={1} overflow='auto' maxHeight='100%'>
+            {messages.map((message, index) => (
+                <Box key={index} display="flex" justifyContent={message.role === 'assistant' ? 'flex-start' : 'flex-end'}> 
+                  <Box bgcolor={message.role === 'assistant' ? 'primary.main' : 'secondary.main'} color="white" borderRadius={16} p={3}>
+                    {message.content}
+                  </Box>
+                </Box>
             ))}
-            <div ref={messageEndRef}/>
-              {isTyping && <p className="italic text-left m-2">Typing...</p>}
-            </div>
-            <TextField fullWidth variant='outlined' placeholder="Type your message..." value={userInput} onChange={(e) => setUserInput(e.target.value)} onKeyPress={(e) => (e.key === "Enter" ? handleSendMessages() : null)} margin='normal' className="bg-white"/>
-            <Button onClick={handleSendMessages} endIcon={<SendIcon/>} color="primary" variant="contained" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-lg mt-2">Send</Button>
-        </DialogContent>
-      </Dialog>
-    </>
+          </Stack>
+
+          <Stack direction="row" spacing={2}>
+            <TextField label="Message" value={message} onChange={(e) => { setMessage(e.target.value) }} fullWidth/>
+            <Button variant='contained'>
+              Send
+            </Button>
+          </Stack>
+        </Stack>
+    </Box>
   );
 };
 
